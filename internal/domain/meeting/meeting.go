@@ -70,6 +70,55 @@ func (m *Meeting) Cancel() error{
 	return nil
 }
 
+func (m *Meeting) Update(title string, startsAt time.Time, duration time.Duration) error{
+	if m.Status == StatusCanceled{
+		return domErrors.ErrAlreadyCanceled
+	}
+	if m.Status == StatusOngoing{
+		return domErrors.ErrOngoing
+	}
+
+	now := time.Now()
+    changed := false
+
+	if title != "" {
+        if l := len(title); l < 1 || l > maxTitleLen {
+            return domErrors.ErrInvalidTitle
+        }
+    }
+	if !startsAt.IsZero() {
+        if !startsAt.After(now) {
+            return domErrors.ErrInvalidTime
+        }
+    }
+	if duration != 0 {
+        if duration < minDuration || duration > maxDuration {
+            return domErrors.ErrInvalidDuration
+        }
+    }
+
+	if title != "" && title != m.Title {
+        m.Title = title
+        changed = true
+    }
+    if !startsAt.IsZero() && !startsAt.Equal(m.StartsAt) {
+        m.StartsAt = startsAt
+        changed = true
+    }
+    if duration != 0 && duration != m.Duration {
+        m.Duration = duration
+        changed = true
+    }
+
+	if !changed{
+		return nil
+	}
+	
+	m.updatedAt = time.Now()
+	m.addEvent(MeetingUpdated{ID: m.ID})
+	return nil
+}
+
 func (m *Meeting) Events() []any {
     return m.events
 }

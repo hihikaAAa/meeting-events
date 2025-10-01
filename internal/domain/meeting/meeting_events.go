@@ -11,3 +11,7 @@ type MeetingCreated struct {
 type MeetingCanceled struct {
     ID uuid.UUID
 }
+
+type MeetingUpdated struct{
+    ID uuid.UUID
+}
