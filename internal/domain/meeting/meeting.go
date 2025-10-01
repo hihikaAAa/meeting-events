@@ -19,8 +19,8 @@ type Meeting struct{
 	StartsAt time.Time
 	Duration  time.Duration
 	Status Status
-	createdAt time.Time
-	updatedAt time.Time
+	CreatedAt time.Time
+	UpdatedAt time.Time
 	events []any
 }
 
@@ -49,8 +49,8 @@ func NewMeeting (title string, startsAt time.Time, duration time.Duration)(*Meet
 		StartsAt: startsAt,
 		Duration: duration,
 		Status: StatusScheduled,
-		createdAt: time.Now(),
-		updatedAt: time.Now(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 		
 	}
 	m.addEvent(MeetingCreated{ID: m.ID})
@@ -65,7 +65,7 @@ func (m *Meeting) Cancel() error{
 		return domErrors.ErrOngoing
 	}
 	m.Status = StatusCanceled
-	m.updatedAt = time.Now()
+	m.UpdatedAt = time.Now()
 	m.addEvent(MeetingCanceled{ID: m.ID})
 	return nil
 }
@@ -113,8 +113,8 @@ func (m *Meeting) Update(title string, startsAt time.Time, duration time.Duratio
 	if !changed{
 		return nil
 	}
-	
-	m.updatedAt = time.Now()
+
+	m.UpdatedAt = time.Now()
 	m.addEvent(MeetingUpdated{ID: m.ID})
 	return nil
 }
@@ -125,3 +125,9 @@ func (m *Meeting) Events() []any {
 func (m *Meeting) addEvent(e any) {
     m.events = append(m.events, e)
 }
+
+func (m *Meeting) RestoreTimestamps(created, updated time.Time) {
+  m.CreatedAt = created  
+  m.UpdatedAt = updated
+}
+

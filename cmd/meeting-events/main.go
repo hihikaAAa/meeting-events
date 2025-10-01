@@ -2,10 +2,17 @@ package main
 
 import (
 	
-	"github.com/joho/godotenv"
+	"context"
+    "log/slog"
+    "os"
+    "time"
 
-	"github.com/hihikaAAa/meeting-events/internal/config"
-	"github.com/hihikaAAa/meeting-events/internal/lib/logger/setup"
+    "github.com/joho/godotenv"
+
+    "github.com/hihikaAAa/meeting-events/internal/config"
+    "github.com/hihikaAAa/meeting-events/internal/lib/logger/setup"
+    pg "github.com/hihikaAAa/meeting-events/internal/adapters/postgres"
+
 )
 
 func main(){
@@ -15,5 +22,24 @@ func main(){
 
 	log := setup.SetupLogger(cfg.Env)
 
-	log.Info("Запустил проект")
+	slog.SetDefault(log)
+
+	ctx,cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	db, err := pg.New(
+        ctx,
+        cfg.DB.DSN,
+        int32(cfg.DB.MaxOpenConns),       
+        cfg.DB.ConnMaxLifetime,             
+        5*time.Minute,                      
+    )
+	 if err != nil {
+        log.Error("db init failed", slog.String("err", err.Error()))
+        os.Exit(1)
+    }
+	defer db.Pool.Close()
+
+	
+	
 }
