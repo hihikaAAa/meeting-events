@@ -46,9 +46,10 @@ type Migrations struct{
 	Dir string `yaml:"dir" env-default:"file://migrations"`
 }
 
-type Outbox struct{
+type Outbox struct {
 	PollInterval time.Duration `yaml:"poll_interval" env-default:"3s"`
-	BatchSize int `yaml:"batch_size" env-default:"100"`
+	BatchSize    int           `yaml:"batch_size" env-default:"100"`
+	Enabled      bool          `yaml:"enabled" env-default:"true"`
 }
 
 func MustLoad() *Config{

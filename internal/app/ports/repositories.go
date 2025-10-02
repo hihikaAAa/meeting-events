@@ -2,7 +2,7 @@ package ports
 
 import(
 	"context"
-
+  
 	"github.com/google/uuid"
 
   	"github.com/hihikaAAa/meeting-events/internal/domain/meeting"
@@ -17,4 +17,6 @@ type MeetingRepository interface {
 
 type OutboxRepository interface {
   Add(ctx context.Context, aggregate string, aggregateID uuid.UUID, eventType string, payload any) error
+  FetchPending(ctx context.Context, limit int) ([]OutboxEvent, error)
+	MarkProcessed(ctx context.Context, ids []int64) error
 }

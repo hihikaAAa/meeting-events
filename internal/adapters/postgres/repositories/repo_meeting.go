@@ -62,7 +62,11 @@ func (r *meetingRepo) Update(ctx context.Context, m *meeting.Meeting) error {
 
 func (r *meetingRepo) Cancel(ctx context.Context, id uuid.UUID) error {
   cmd, err := r.tx.Exec(ctx, `UPDATE meetings SET status='canceled', updated_at=now() WHERE id=$1`, id)
-  if err != nil { return err }
-  if cmd.RowsAffected() == 0 { return app.ErrNotFound }
+  if err != nil {
+     return err 
+    }
+  if cmd.RowsAffected() == 0 {
+    return app.ErrNotFound 
+  }
   return nil
 }

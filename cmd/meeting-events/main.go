@@ -24,6 +24,7 @@ import (
 	ucreate "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/create"
 	uupdate "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/update"
 	mig "github.com/hihikaAAa/meeting-events/internal/adapters/postgres/migrate"
+	obw "github.com/hihikaAAa/meeting-events/internal/services/outboxworker"
 
 )
 
@@ -57,6 +58,14 @@ func main(){
 	defer db.Pool.Close()
 
 	uow := pg.NewUoW(db.Pool)
+
+	if cfg.Outbox.Enabled {
+		pub := obw.NewLogPublisher(log)
+		worker := obw.New(log, uow, pub, cfg.Outbox.BatchSize, cfg.Outbox.PollInterval)
+		worker.Start(ctx)
+	}
+
+
 	ucCreate := ucreate.New(uow)
 	ucUpdate := uupdate.New(uow)
 	ucCancel := ucancel.New(uow)

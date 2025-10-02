@@ -63,9 +63,21 @@ func (m *MockMeetRepo) Cancel(context.Context, uuid.UUID) error{
 
 type MockOutbox struct {
 	Added int
+
+	Pending  []ports.OutboxEvent
+	Marked   []int64
 }
 
 func (m *MockOutbox) Add(context.Context, string, uuid.UUID, string, any) error {
 	m.Added++
+	return nil
+}
+
+func (m *MockOutbox) FetchPending(context.Context, int) ([]ports.OutboxEvent, error) {
+	return m.Pending, nil
+}
+
+func (m *MockOutbox) MarkProcessed(_ context.Context, ids []int64) error {
+	m.Marked = append(m.Marked, ids...)
 	return nil
 }
