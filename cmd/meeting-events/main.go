@@ -20,6 +20,7 @@ import (
 	hget "github.com/hihikaAAa/meeting-events/internal/httpserver/handlers/meeting/get"
 	hupdate "github.com/hihikaAAa/meeting-events/internal/httpserver/handlers/meeting/update"
 	"github.com/hihikaAAa/meeting-events/internal/lib/logger/setup"
+	sl "github.com/hihikaAAa/meeting-events/internal/lib/logger/handlers/sl"
 	ucancel "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/cancel"
 	ucreate "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/create"
 	uupdate "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/update"
@@ -105,6 +106,9 @@ func main(){
 
 	ctxShut, cancelShut := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancelShut()
-	_ = srv.Shutdown(ctxShut)
-	log.Info("stopped")
+	if err := srv.Shutdown(ctxShut); err != nil {
+        log.Error("Forced shutdown: %v", sl.Err(err))
+		os.Exit(1)
+    }
+	log.Info("Server exited gracefully")
 }
