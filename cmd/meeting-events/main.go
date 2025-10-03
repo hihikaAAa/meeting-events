@@ -32,7 +32,7 @@ func main(){
 	_ = godotenv.Load("local.env")
 
 	cfg := config.MustLoad()
-
+	
 	log := setup.SetupLogger(cfg.Env)
 
 	slog.SetDefault(log)
@@ -51,10 +51,11 @@ func main(){
         log.Error("db init failed", slog.String("err", err.Error()))
         os.Exit(1)
     }
-	if err := mig.Up(ctx, db.Pool); err != nil {
+	if err := mig.Up(ctx, db.Pool,cfg.Migrations.Dir); err != nil {
 		log.Error("migrations failed", slog.String("err", err.Error()))
 		os.Exit(1)
 	}
+
 	defer db.Pool.Close()
 
 	uow := pg.NewUoW(db.Pool)
@@ -64,7 +65,6 @@ func main(){
 		worker := obw.New(log, uow, pub, cfg.Outbox.BatchSize, cfg.Outbox.PollInterval)
 		worker.Start(ctx)
 	}
-
 
 	ucCreate := ucreate.New(uow)
 	ucUpdate := uupdate.New(uow)

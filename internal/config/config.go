@@ -36,14 +36,14 @@ type HTTPTimeout struct{
 }
 
 type DB struct{
-	DSN string `yaml:"dsn" env-default:"postgres://user:pass@db:5432/meetings?sslmode=disable" env-required:"true"`
+	DSN string `yaml:"dsn" env-default:"postgres://user:pass@db:5433/meetings?sslmode=disable" env-required:"true"`
 	MaxOpenConns int `yaml:"max_open_conns" env-default:"20"`
 	MaxIdleConns int `yaml:"max_idle_conns" env-default:"5"`
 	ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime" env-default:"30m"`
 }
 
 type Migrations struct{
-	Dir string `yaml:"dir" env-default:"file://migrations"`
+	Dir string `yaml:"dir" env-default:"file://internal/adapters/postgres/init"`
 }
 
 type Outbox struct {

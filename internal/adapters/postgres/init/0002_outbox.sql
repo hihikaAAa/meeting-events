@@ -8,6 +8,5 @@ CREATE TABLE IF NOT EXISTS outbox (
   processed_at  TIMESTAMPTZ NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_outbox_unprocessed ON outbox(processed_at) WHERE processed_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_outbox_unprocessed ON outbox(processed_at);
 
-DROP TABLE IF EXISTS outbox;

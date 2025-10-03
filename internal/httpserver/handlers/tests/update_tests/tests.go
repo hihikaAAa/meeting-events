@@ -37,7 +37,7 @@ func TestUpdate_HappyPath(t *testing.T) {
 
 	body := map[string]any{
 		"title":    "New",
-		"duration": (90 * time.Minute).Nanoseconds(),
+		"duration": (90 * time.Minute),
 	}
 	b, _ := json.Marshal(body)
 

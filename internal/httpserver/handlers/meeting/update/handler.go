@@ -26,7 +26,7 @@ func New(log *slog.Logger, uc *update.UseCase) http.Handler {
 type request struct {
 	Title    string        `json:"title"`    
 	StartsAt time.Time     `json:"starts_at"`
-	Duration time.Duration `json:"duration"` 
+	Duration int `json:"duration"` 
 }
 
 type response struct{ ID string `json:"id"` }
@@ -48,7 +48,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ID:       id,
 		Title:    req.Title,
 		StartsAt: req.StartsAt,
-		Duration: req.Duration,
+		Duration: time.Duration(req.Duration)*time.Minute,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), httpx.HttpStatusFromErr(err))

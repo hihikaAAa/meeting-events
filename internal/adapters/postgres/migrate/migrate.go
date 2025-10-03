@@ -1,40 +1,57 @@
 package migrate
 
 import (
-    "context"
-    "embed"
-    "fmt"
-    "sort"
-    "strings"
+	"context"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+    
 
-    "github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/pgxpool"
+
 )
+func Up(ctx context.Context, pool *pgxpool.Pool, dir string) error {
+	dir = strings.TrimPrefix(dir, "file://")
 
-var files embed.FS
-
-func Up(ctx context.Context, pool *pgxpool.Pool) error {
-    entries, err := files.ReadDir("../init")
-    if err != nil { 
+	abs, err := filepath.Abs(dir)
+	if err != nil {
 		return err
 	}
 
-    names := make([]string, 0, len(entries))
-    for _, e := range entries {
-        if e.IsDir() { 
-			continue 
-		}
-        if strings.HasSuffix(e.Name(), ".sql") { 
-			names = append(names, e.Name()) 
-		}
-    }
-    sort.Strings(names)
+	info, err := os.Stat(abs)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return &fs.PathError{Op: "open", Path: abs, Err: fs.ErrNotExist}
+	}
 
-    for _, name := range names {
-        b, err := files.ReadFile("../init/" + name)
-        if err != nil { return err }
-        if _, err := pool.Exec(ctx, string(b)); err != nil {
-            return fmt.Errorf("apply %s: %w", name, err)
-        }
-    }
-    return nil
+	entries, err := os.ReadDir(abs)
+	if err != nil {
+		return err
+	}
+	var files []string
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		if strings.HasSuffix(strings.ToLower(e.Name()), ".sql") {
+			files = append(files, e.Name())
+		}
+	}
+	sort.Strings(files)
+
+	for _, name := range files {
+		full := filepath.Join(abs, name)
+		b, err := os.ReadFile(full)
+		if err != nil {
+			return err
+		}
+		if _, err := pool.Exec(ctx, string(b)); err != nil {
+			return &fs.PathError{Op: "exec", Path: full, Err: err}
+		}
+	}
+	return nil
 }

@@ -35,7 +35,7 @@ func TestCreate_HappyPath(t *testing.T) {
 	body := map[string]any{
 		"title":     "Demo",
 		"starts_at": time.Now().Add(time.Hour).UTC().Format(time.RFC3339),
-		"duration":  (45 * time.Minute).Nanoseconds(),
+		"duration":  (45 * time.Minute),
 	}
 	b, _ := json.Marshal(body)
 
@@ -75,7 +75,7 @@ func TestCreate_ValidationError(t *testing.T) {
 	body := map[string]any{
 		"title":     "", 						
 		"starts_at": time.Now().Add(time.Hour).UTC().Format(time.RFC3339),
-		"duration":  (30 * time.Minute).Nanoseconds(),
+		"duration":  (30 * time.Minute),
 	}
 	b, _ := json.Marshal(body)
 

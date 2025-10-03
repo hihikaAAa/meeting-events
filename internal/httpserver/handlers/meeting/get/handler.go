@@ -28,7 +28,7 @@ type response struct {
 	ID        string `json:"id"`
 	Title     string `json:"title"`
 	StartsAt  string `json:"starts_at"`
-	DurationS int64  `json:"duration_seconds"`
+	DurationS int64  `json:"duration_minutes"`
 	Status    string `json:"status"`
 }
 
@@ -50,7 +50,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			ID:        m.ID.String(),
 			Title:     m.Title,
 			StartsAt:  m.StartsAt.UTC().Format(time.RFC3339),
-			DurationS: int64(m.Duration / time.Second),
+			DurationS: int64(m.Duration),
 			Status:    string(m.Status),
 		}
 		return nil

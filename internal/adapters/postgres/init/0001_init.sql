@@ -9,5 +9,3 @@ CREATE TABLE IF NOT EXISTS meetings (
 );
 
 CREATE INDEX IF NOT EXISTS idx_meetings_starts_at ON meetings(starts_at);
-
-DROP TABLE IF EXISTS meetings;

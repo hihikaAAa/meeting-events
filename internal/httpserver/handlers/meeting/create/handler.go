@@ -18,7 +18,7 @@ type Handler struct {
 type request struct {
 	Title    string        `json:"title"`
 	StartsAt time.Time     `json:"starts_at"`
-	Duration time.Duration `json:"duration"` 
+	Duration int `json:"duration"` 
 }
 
 type response struct {
@@ -37,7 +37,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	out, err := h.UC.Handle(r.Context(), create.Input{
 		Title:    req.Title,
 		StartsAt: req.StartsAt,
-		Duration: req.Duration,
+		Duration: time.Duration(req.Duration)*time.Minute,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), httpx.HttpStatusFromErr(err)); return
