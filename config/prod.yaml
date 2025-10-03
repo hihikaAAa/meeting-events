@@ -1,0 +1,27 @@
+env: "prod"
+
+app:
+  name: "meeting-svc"
+  http:
+    address: "0.0.0.0:8081"     
+    timeouts:
+      read: 4s
+      write: 6s
+      idle: 60s
+      event: 5s
+    user: "user"              
+    password: "pass"    
+
+db:
+  dsn: "postgres://user:pass@db:5432/meetings?sslmode=disable"  
+  max_open_conns: 20
+  max_idle_conns: 5
+  conn_max_lifetime: "30m"
+
+migrations:
+  dir: "file://internal/adapters/postgres/init"
+
+outbox:
+  poll_interval: "3s"
+  batch_size: 100
+  enabled: true
