@@ -40,7 +40,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var req request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "bad json", http.StatusBadRequest)
+		h.Log.Warn("bad json", slog.String("err", err.Error()))
+    	httpx.WriteError(w, http.StatusBadRequest, "bad_json", "invalid request body")
 		return
 	}
 
@@ -51,7 +52,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Duration: time.Duration(req.Duration)*time.Minute,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), httpx.HttpStatusFromErr(err))
+		status, code, msg := httpx.HttpStatusFromErr(err)
+    	httpx.WriteError(w, status, code, msg)
 		return
 	}
 

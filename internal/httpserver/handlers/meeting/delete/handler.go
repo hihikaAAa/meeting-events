@@ -33,7 +33,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	out, err := h.UC.Handle(r.Context(), cancel.Input{ID: id})
 	if err != nil {
-		http.Error(w, err.Error(), httpx.HttpStatusFromErr(err))
+		status, code, msg := httpx.HttpStatusFromErr(err)
+    	httpx.WriteError(w, status, code, msg)
 		return
 	}
 

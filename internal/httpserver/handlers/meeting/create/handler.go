@@ -32,7 +32,9 @@ func New(log *slog.Logger, uc *create.UseCase) http.Handler {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var req request
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "bad json", http.StatusBadRequest); return
+		h.Log.Warn("bad json", slog.String("err", err.Error()))
+    	httpx.WriteError(w, http.StatusBadRequest, "bad_json", "invalid request body")
+		return
 	}
 	out, err := h.UC.Handle(r.Context(), create.Input{
 		Title:    req.Title,
@@ -40,7 +42,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Duration: time.Duration(req.Duration)*time.Minute,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), httpx.HttpStatusFromErr(err)); return
+		status, code, msg := httpx.HttpStatusFromErr(err)
+    	httpx.WriteError(w, status, code, msg) 
+		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	_ = json.NewEncoder(w).Encode(response{ID: out.ID})

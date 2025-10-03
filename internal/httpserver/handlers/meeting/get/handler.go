@@ -56,7 +56,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 	if err != nil {
-		http.Error(w, err.Error(), httpx.HttpStatusFromErr(err))
+		status, code, msg := httpx.HttpStatusFromErr(err)
+    	httpx.WriteError(w, status, code, msg)
 		return
 	}
 
