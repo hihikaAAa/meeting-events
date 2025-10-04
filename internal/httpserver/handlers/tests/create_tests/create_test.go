@@ -1,4 +1,4 @@
-package createtests
+package createtest
 
 import (
 	"bytes"
@@ -35,7 +35,7 @@ func TestCreate_HappyPath(t *testing.T) {
 	body := map[string]any{
 		"title":     "Demo",
 		"starts_at": time.Now().Add(time.Hour).UTC().Format(time.RFC3339),
-		"duration":  (45 * time.Minute),
+		"duration":  45,
 	}
 	b, _ := json.Marshal(body)
 

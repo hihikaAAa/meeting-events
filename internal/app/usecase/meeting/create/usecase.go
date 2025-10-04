@@ -24,7 +24,7 @@ func (uc *UseCase) Handle(ctx context.Context, in Input) (Output, error){
 	if err != nil{
 		switch err{
 		case domErrors.ErrInvalidTitle, domErrors.ErrInvalidDuration,domErrors.ErrInvalidDuration:
-				return Output{}, app.ErrValidation
+			return Output{}, app.ErrValidation
 		default:
 			return Output{},err	
 		}

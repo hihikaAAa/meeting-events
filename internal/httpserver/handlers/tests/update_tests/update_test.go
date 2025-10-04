@@ -37,7 +37,7 @@ func TestUpdate_HappyPath(t *testing.T) {
 
 	body := map[string]any{
 		"title":    "New",
-		"duration": (90 * time.Minute),
+		"duration": 90,
 	}
 	b, _ := json.Marshal(body)
 
@@ -70,13 +70,15 @@ func TestUpdate_BadID(t *testing.T) {
 func TestUpdate_Validation(t *testing.T) {
 	log := slogdiscard.NewDiscardLogger()
 
-	existing, _ := meeting.NewMeeting("Old", time.Now().Add(time.Hour), 30*time.Minute)
+	existing, _ := meeting.NewMeeting("Old", time.Now().Add(time.Hour),30*time.Minute)
 	mr := &tool.MockMeetRepo{Fetched: existing}
 	uow := tool.FakeUoW{Repos: tool.FakeRepos{Mr: mr, Or: &tool.MockOutbox{}}}
 	uc := uupdate.New(uow)
 	h := hupdate.New(log, uc)
 
-	body := map[string]any{"title": ""} 
+	body := map[string]any{
+		"starts_at": time.Now().Add(-time.Hour).UTC().Format(time.RFC3339),
+	}
 	b, _ := json.Marshal(body)
 
 	r, url := mountUpdate(h, existing.ID.String())
@@ -86,5 +88,15 @@ func TestUpdate_Validation(t *testing.T) {
 
 	r.ServeHTTP(rr, req)
 
-	require.Equal(t, http.StatusBadRequest, rr.Code)
+	require.Equal(t, http.StatusBadRequest, rr.Code,rr.Body.String())
+
+	body2 := map[string]any{"duration": -5}
+	b2, _ := json.Marshal(body2)
+
+	req2 := httptest.NewRequest(http.MethodPatch, url, bytes.NewReader(b2))
+	req2.Header.Set("Content-Type", "application/json")
+	rr2 := httptest.NewRecorder()
+
+	r.ServeHTTP(rr2, req2)
+	require.Equal(t, http.StatusBadRequest, rr2.Code, rr2.Body.String())
 }
