@@ -82,7 +82,7 @@
 
 ## Примеры запросов к API(curl)
 
-1. Создание встречи(Create)
+### 1. Создание встречи(Create)
    ```bash 
    curl -X POST http://localhost:8081/v1/meetings/ \
    -u user:pass \
@@ -94,13 +94,13 @@
    }'
   ```
 
-   Ответ: 
+### Ответ: 
     ```json
     {"id": "f6e4f9a9-3c58-4f83-83b8-b9ad2bcd9c24"}
     ```
 
 
-2. Получение встречи по id(Get)
+### 2. Получение встречи по id(Get)
 
    ```bash
    curl -X GET http://localhost:8081/v1/meetings/<id> \
@@ -108,7 +108,7 @@
   ```
 
 
-3. Обновление информации о встрече(Update)
+### 3.Обновление информации о встрече(Update)
 
    ```bash
    curl -X PATCH http://localhost:8081/v1/meetings/<id> \
