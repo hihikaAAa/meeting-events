@@ -5,42 +5,51 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+	"runtime"
 
-	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/docker/go-connections/nat"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/wait"
 
 	pg "github.com/hihikaAAa/meeting-events/internal/adapters/postgres"
 	mig "github.com/hihikaAAa/meeting-events/internal/adapters/postgres/migrate"
 
-	ucreate "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/create"
 	ucancel "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/cancel"
+	ucreate "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/create"
 	uupdate "github.com/hihikaAAa/meeting-events/internal/app/usecase/meeting/update"
 
+	"log/slog"
+
+	"github.com/hihikaAAa/meeting-events/internal/httpserver"
 	hcreate "github.com/hihikaAAa/meeting-events/internal/httpserver/handlers/meeting/create"
 	hdelete "github.com/hihikaAAa/meeting-events/internal/httpserver/handlers/meeting/delete"
 	hget "github.com/hihikaAAa/meeting-events/internal/httpserver/handlers/meeting/get"
 	hupdate "github.com/hihikaAAa/meeting-events/internal/httpserver/handlers/meeting/update"
-	"github.com/hihikaAAa/meeting-events/internal/httpserver"
 	"github.com/hihikaAAa/meeting-events/internal/lib/logger/setup"
-	"log/slog"
 )
 
 func TestMeetingsCRUD_E2E(t *testing.T) {
-	t.Parallel()
 
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
-	pgC, err := postgres.Run(ctx,
-		"postgres:16-alpine",
-		postgres.WithDatabase("meetings"),
-		postgres.WithUsername("user"),
-		postgres.WithPassword("pass"),
-	)
+	 pgC, err := postgres.Run(ctx,
+        "postgres:16-alpine",
+        postgres.WithDatabase("meetings"),
+        postgres.WithUsername("user"),
+        postgres.WithPassword("pass"),
+        testcontainers.WithWaitStrategy(
+            wait.ForLog("database system is ready to accept connections").
+                WithOccurrence(2).
+                WithStartupTimeout(2 * time.Minute),
+        ),
+    )
 	if err != nil {
 		t.Fatalf("postgres up: %v", err)
 	}
@@ -64,7 +73,8 @@ func TestMeetingsCRUD_E2E(t *testing.T) {
 	}
 	t.Cleanup(func() { db.Pool.Close() })
 
-	if err := mig.Up(ctx, db.Pool, "file://internal/adapters/postgres/init"); err != nil {
+	migDir := filepath.Join(repoRoot(), "internal", "adapters", "postgres", "init")
+	if err := mig.Up(ctx, db.Pool, "file://" + migDir); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
 
@@ -142,4 +152,10 @@ func TestMeetingsCRUD_E2E(t *testing.T) {
 	if delRes.StatusCode != http.StatusOK {
 		t.Fatalf("delete status=%d", delRes.StatusCode)
 	}
+}
+
+
+func repoRoot() string {
+    _, thisFile, _, _ := runtime.Caller(0)
+    return filepath.Join(filepath.Dir(thisFile), "..")
 }
