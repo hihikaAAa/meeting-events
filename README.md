@@ -103,8 +103,8 @@
 ### 2. Получение встречи по id(Get)
 
    ```bash
-   curl -X GET http://localhost:8081/v1/meetings/<id> \
-  -u user:pass 
+   curl -u user:pass \
+  "http://localhost:8081/v1/meetings/id"
   ```
 
 
