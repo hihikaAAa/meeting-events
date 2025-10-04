@@ -82,13 +82,13 @@
 1. Создание встречи(Create)
    ```bash 
    curl -X POST http://localhost:8081/v1/meetings/ \
-  -u user:pass \
-  -H "Content-Type: application/json" \
-  -d '{
+   -u user:pass \
+   -H "Content-Type: application/json" \
+   -d '{
     "title": "Daily sync",
     "starts_at": "2030-01-01T09:00:00Z",
     "duration": 45
-  }'
+   }'
   ```
 
 Ответ: 
@@ -107,13 +107,13 @@
 
    ```bash
    curl -X PATCH http://localhost:8081/v1/meetings/<id> \
-  -u user:pass \
-  -H "Content-Type: application/json" \
-  -d '{
+   -u user:pass \
+   -H "Content-Type: application/json" \
+   -d '{
     "title": "Updated meeting",
     "starts_at": "2030-01-01T10:00:00Z",
     "duration": 60
-  }'
+   }'
   ```
 
 4. Удаление встречи (Delete)
@@ -125,11 +125,11 @@
 
 
 ## Тестирование
-Unit-тесты 
-На каждый use-case, handler,dto написаны unit-тесты. Они распологаются рядом с кодом их логики.
+### Unit-тесты 
+- На каждый use-case, handler,dto написаны unit-тесты. Они распологаются рядом с кодом их логики.
 
-Функциональные/интеграционные тесты
-Находятся в tests/
+### Функциональные/интеграционные тесты
+- Находятся в tests/
 
 ## Технологии
 
@@ -143,8 +143,8 @@ Unit-тесты
 
 ## Разработчик
 
-Автор: Апанасевич Сергей
-Email: heheka800@gmail.com
+- Автор: Апанасевич Сергей
+- Email: heheka800@gmail.com
 
 
 
