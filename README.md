@@ -95,9 +95,10 @@
   ```
 
 ### Ответ: 
-    ```json
+    ```bash
     {"id": "f6e4f9a9-3c58-4f83-83b8-b9ad2bcd9c24"}
     ```
+
 
 
 ### 2. Получение встречи по id(Get)
@@ -122,7 +123,7 @@
   ```
 
 
-4. Удаление встречи (Delete)
+### 4. Удаление встречи (Delete)
 
    ```bash
    curl -X DELETE http://localhost:8081/v1/meetings/<id> \
